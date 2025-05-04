@@ -39,7 +39,17 @@ def analyze_instagram(data, filename):
     
 
 def analyze_tiktok(data, filename):
-    filename = ""
+    split_filename = filename.split("_")
+    date = split_filename[1]
+    # time = split_filename[2].split(".")[0]
+    for post in data["data"]:
+        play_count = post["statistics"]["play_count"]
+        comment_count = post["statistics"]["comment_count"] 
+        if date in date_with_count_tiktok:
+            date_with_count_tiktok[date]["plays"] += play_count
+            date_with_count_tiktok[date]["comments"] += comment_count
+        else:
+            date_with_count_tiktok[date] = {"plays": play_count, "comments": comment_count}
 
 
 def write_to_csv(platform):
@@ -54,4 +64,5 @@ def write_to_csv(platform):
             for key, value in sorted(date_with_count_tiktok.items()):
                 writer.writerow([key, value])
 
-load_json("instagram")
+# load_json("instagram")
+load_json("tiktok")
