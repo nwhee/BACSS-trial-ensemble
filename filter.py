@@ -1,8 +1,8 @@
 import json
 import os
 
-instagram_dir = "BACSS-trial-ensemble/ensemble_data/raw_instagram"
-tiktok_dir = "BACSS-trial-ensemble/ensemble_data/raw_tiktok"
+instagram_dir = "ensemble_data/raw_instagram"
+tiktok_dir = "ensemble_data/raw_tiktok"
 
 def load_json(platform):
     """
@@ -21,10 +21,38 @@ def load_json(platform):
 
                 # filtering out files about rate limit
                 if "detail" not in data:
+                    remove_links(data, "")
                     write_json_to_filter_dir(
                         data,
-                        f"BACSS-trial-ensemble/ensemble_data/filtered_{platform}",
+                        f"ensemble_data/filtered_{platform}",
                         filename)
+
+
+def remove_links(dictionary, key):
+    """
+    Removes links from the given dictionary
+
+    Args:
+        dictionary (any): The dictionary created from JSON data
+        key (str): The key used to access the value in the dict
+    """
+
+    if key:
+        dictionary = dictionary[key]
+    
+    if isinstance(dictionary, dict):
+        keys = dictionary.copy().keys()
+        for key in keys:
+            if isinstance(dictionary[key], str) and "https" in dictionary[key]:
+                del dictionary[key]
+                print(f"Removed {key} from dictionary")
+                keys = dictionary.keys()
+            else:
+                remove_links(dictionary, key)
+    elif isinstance(dictionary, list):
+        for item in dictionary:
+            remove_links(item, "")
+
 
 def write_json_to_filter_dir(data, directory, filename):
     """
